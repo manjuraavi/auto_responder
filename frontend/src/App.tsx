@@ -2,8 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import React from 'react';
 
 function AppRoutes() {
   const { user, loading } = useAuth();
@@ -20,6 +21,14 @@ function AppRoutes() {
 }
 
 export default function App() {
+  React.useEffect(() => {
+    const handler = (e: any) => {
+      toast.error(e.detail || "You are sending requests too quickly. Please wait and try again.");
+    };
+    window.addEventListener("rateLimitExceeded", handler);
+    return () => window.removeEventListener("rateLimitExceeded", handler);
+  }, []);
+  
   return (
     <Router>
       <AuthProvider>

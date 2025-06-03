@@ -170,6 +170,7 @@ async def get_email(
 @user_limiter.limit("3/minute")
 async def reply_to_email(
     email_id: str,
+    request: Request,
     reply: schemas.ReplyEmailRequest,
     gmail_service: GmailService = Depends(get_gmail_service),
     agent_service: AgentService = Depends(get_agent_service)
