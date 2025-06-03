@@ -1,0 +1,51 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+*.env
+.venv.*
+.venv/
+venv/
+
+# Build output
+dist/
+build/
+out/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+
+# Misc
+*.local
+*.cache
+
+_pycache_/
+toggle_state.json
+__pycache__/
+*.pyc
+*.sqlite3
+
+# Optional - if you want to ignore these files
+package-lock.json
+vite-env.d.ts
+vite.config.ts
