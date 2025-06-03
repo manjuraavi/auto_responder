@@ -112,10 +112,12 @@ class SystemInfo(BaseModel):
     environment: str = Field(description="Deployment environment")
 
 class HealthCheck(BaseModel):
-    """Health check response model"""
-    status: str = Field(description="Overall system health status")
-    timestamp: datetime = Field(description="Time of health check")
-    services: Dict[str, str] = Field(description="Status of individual services")
+    status: str
+    timestamp: datetime
+    services: Dict[str, str]
+    metrics: Optional[Dict[str, float]] = None
+    response_times: Optional[Dict[str, float]] = None
+    error: Optional[str] = None
 
 class EmailIngestionRequest(BaseModel):
     days_back: int

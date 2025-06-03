@@ -24,6 +24,7 @@ from app.utils.exceptions import (
     AIServiceException,
     VectorDBException
 )
+from app.utils.health_monitor import HealthService
 from app.utils.logging_config import setup_logging
 
 # Import models and schemas
@@ -226,42 +227,7 @@ async def root():
 @app.get("/health", response_model=HealthCheck)
 async def health_check():
     """Comprehensive health check"""
-    try:
-        # Check Gmail service
-        gmail_status = "healthy" if await GmailService.verify_connection() else "unhealthy"
-        
-        # Check Agent service
-        agent_status = "healthy" if await AgentService.verify_connection() else "unhealthy"
-        
-        # Check Document service
-        doc_status = "healthy" if await DocumentService.verify_connection() else "unhealthy"
-        
-        overall_status = "healthy" if all([
-            gmail_status == "healthy",
-            agent_status == "healthy",
-            doc_status == "healthy"
-        ]) else "unhealthy"
-        
-        return HealthCheck(
-            status=overall_status,
-            timestamp=datetime.utcnow(),
-            services={
-                "gmail_service": gmail_status,
-                "agent_service": agent_status,
-                "document_service": doc_status
-            }
-        )
-    except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        return HealthCheck(
-            status="unhealthy",
-            timestamp=datetime.utcnow(),
-            services={
-                "gmail_service": "unknown",
-                "agent_service": "unknown",
-                "document_service": "unknown"
-            }
-        )
+    return await HealthService.get_detailed_health()
 
 if __name__ == "__main__":
     import uvicorn

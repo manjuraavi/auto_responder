@@ -23,6 +23,39 @@ class DocumentService:
         self.vector_service.initialize()
         self.encoding = tiktoken.get_encoding("cl100k_base")
 
+    @staticmethod
+    async def verify_connection() -> bool:
+        """Verify if document service and its dependencies are accessible"""
+        try:
+            # Create temporary service instance to test connection
+            temp_service = DocumentService(user_id="health_check")
+            
+            # Check vector service connection
+            if not temp_service.vector_service.verify_connection():
+                logger.error("Vector service connection failed")
+                return False
+                
+            # Check file system access for document processing
+            test_dir = os.path.join(settings.UPLOAD_DIR, "health_check")
+            os.makedirs(test_dir, exist_ok=True)
+            test_file = os.path.join(test_dir, "test.txt")
+            
+            try:
+                with open(test_file, "w") as f:
+                    f.write("health check")
+                os.remove(test_file)
+                os.rmdir(test_dir)
+            except Exception as e:
+                logger.error(f"File system check failed: {str(e)}")
+                return False
+                
+            logger.info("Document service health check passed")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Document service health check failed: {str(e)}")
+            return False
+
     async def process_document(self, file: UploadFile) -> Dict[str, Any]:
         """Process and store a document"""
         try:

@@ -2,12 +2,15 @@
 Authentication router for Google OAuth2
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from datetime import datetime
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 from typing import Optional
 import logging
 from app.auth.gmail_auth import GmailAuthService
 from app.config.settings import settings
+from app.services.gmail_service import GmailService
+from app.services.vector_service import VectorService
 from app.utils.exceptions import AuthenticationException
 from pydantic import BaseModel
 
