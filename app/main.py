@@ -66,6 +66,8 @@ from app.api.documents import router as document_router
 from app.api.agents import router as agent_router
 from app.api.settings_page import router as settings_router
 
+from app.api.emails import add_rate_limit_handler
+
 # Setup logging
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -141,9 +143,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add authentication middleware
-# app.middleware("http")(auth_middleware)
-
+add_rate_limit_handler(app)
 
 # Include routers with proper prefixes
 app.include_router(auth_router, prefix="/api/auth", tags=["Authentication"])

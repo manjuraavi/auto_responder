@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, FastAPI, HTTPException, status, Depends
 from typing import Optional
 from app.models import schemas
 from app.services.gmail_service import GmailService
@@ -9,6 +9,22 @@ from app.agents.context_retriever import ContextRetrieverAgent
 from app.agents.intent_classifier import IntentClassifierAgent
 from app.auth.gmail_auth import GmailAuthService
 import logging
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi import Request
+
+# User-based key function
+def user_rate_limit_key(request: Request):
+    user = getattr(request.state, "user", None)
+    if user and "email" in user:
+        return user["email"]
+    return get_remote_address(request)
+
+user_limiter = Limiter(key_func=user_rate_limit_key)
+
+def add_rate_limit_handler(app: FastAPI):
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -151,6 +167,7 @@ async def get_email(
         )
 
 @router.post("/{email_id}/reply")
+@user_limiter.limit("3/minute")
 async def reply_to_email(
     email_id: str,
     reply: schemas.ReplyEmailRequest,
